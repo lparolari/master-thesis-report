@@ -293,6 +293,4 @@ TSWLatexianTemp*
 ## Custom configuration
 
 # compilation output
-dissertation*.pdf
-!dissertation*example.pdf
-
+*.pdf
