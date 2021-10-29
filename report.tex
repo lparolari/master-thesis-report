@@ -5,8 +5,10 @@
 \usepackage{amsfonts}
 \usepackage{bm}
 
-\title{blank}
-\author{luca.parolari23 }
+\input{macros.tex}
+
+\title{Weakly Supervised (?) Visual-Textual Grounding based on Concept Similarity}
+\author{Luca Parolari}
 \date{October 2021}
 
 \begin{document}
@@ -15,6 +17,64 @@
 
 \section{Introduction}
 
-TODO
+In this work we propose a simple and interpretable model that learns
+from concept similarity. The goal is to solve phrase localization
+problem under unsupervised settings. Given a noun phrase, we define
+it's concept as the most important word in the phrase, while, given a
+bounding box we define it's class as the label, among a dictionary of
+labels, predicted with maximum confidence by an object detector for
+that bounding box. The concept similarity is the similarity between
+the phrase concept and bounding box class. Here, the key idea is that
+the head of the phrase should be very similar (semantically speaking)
+to the content of the bounding box and thus, to its class. Indeed, we
+optimize the model to learn a representation in this similarity
+subspace, where semantically similar features from image and text
+should be close each other, otherwise they are forced to be
+perpendicular. The unsupervision is obtained thought an oracle that,
+based concept similarty, determines whether to attract or repulse
+features.
+
+% Our model is straightforward. First of all, we gather image features
+% from the object detector and we compute five additional features
+% representing bounding box top left and bottom right corners and area
+% (spatial features). We then project those features to a subspace,
+% performing a dimensionality reduction. Regarding the text, we fisrt
+% compute the word embeddings using a pretrained word emebdding and then
+% we encode the phrase throught an LSTM recurrent neural network. Our
+% predictions are the results of the cosine similarity between projected
+% image features and the last LSTM hidden neuron. In order to obtain the
+% weak supervision, we compute concept similarity which is required to
+% weakly supervise learning by attracting or repulsing features. The
+% attraction is performed when concept similarity between two modalities
+% is above a given threshold, otherwise repulsion is applied. Moreover,
+% we accompany to concept similarity the attribute similarity which
+% helps discriminate between same class bounding boxes. 
+
+\section{Background}
+
+\subsection{Phrase Localization}
+
+Given in input an image $\bm{I}$ and a
+sentence $\mathrm{S}$, phrase grounding consists in learning a mapping
+$\gamma$ from the set $\calQ$ of noun phrases to a set of bounding box
+$\calB$ defined on $\bm{I}$, i.e., $\gamma : \calI \times \calS
+\rightarrow 2^{\calQ \times \calB}$ (Rigoni et al., 2021). So, given
+an image $\bm{I}$ containing $e$ objects identified via the set of
+bounding boxes $B_\calI = \{ b_i \}^e_{i=1}$, where $b_i \in \Rset^4$
+is the vector of coordinates identifying a bounding box in $\bm{I}$,
+and a sentence $\mathrm{S}$ containing $m$ noun phrases gathered in
+the set $\calQ_S = \{ q_j \}^m_{j=1}$, where $q_j \in \Nset^2$ is a
+vector containing as coordinates the initial and final character
+positions in the sentence $\mathrm{S}$, $\gamma(\bm{I}, \mathrm{S})$
+returns a set of couples $\{ (\bm{q}, \bm{b}) \mid \bm{q} \in
+\calQ_{\mathrm{S}}, \bm{b} \in B_{\bm{I}} \}$ where each couple
+$(\bm{q}, \bm{b})$ associates the noun phrase $\bm{q}$ to the bounding
+box $\bm{b}$. Please, notice that the same noun phrase can be
+associated to several different bounding boxes, as well as the same
+bounding box can be associated to many different noun phrases.
+Following the current literature, we assume that each noun phrase is
+associated to one and only one bounding box. Bounding boxes, however,
+can identify more objects, e.g. several persons in the case the noun
+phrase is ``people''.
 
 \end{document}
