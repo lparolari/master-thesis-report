@@ -230,18 +230,18 @@ relevant proposals.
 Hence, we can apply the concept similarity on previously computed
 $\bm{P}_{jz}$ as:
 \begin{equation}
-  \bm{P}^*_{jz} = \fapplysim \left( \bm{P}_{jz} , \bm{S}^c_{jz} \right).
+  \bm{\hat{P}}_{jz} = \fapplysim \left( \bm{S}^c_{jz}, \bm{P}_{jz} \right).
 \end{equation}
-For consistency with other sections, we show that $\bm{P}_{jz}$ is
-equal to $\bm{P}^*_{jz}$ by instancing $\fapplysim$ with
+For consistency with other sections, we show that $\bm{\hat{P}}_{jz}$
+is equal to $\bm{P}_{jz}$ by instancing $\fapplysim$ with
 $\fapplysim^{\text{one}}$, a funcion that simply ignore $\bm{S}^c$
 matrix:
 \begin{equation}
   \fapplysim^{\text{one}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = \bm{P}_{jz}.
 \end{equation}
-Outside of this section, we use the notation $\bm{P}^*$ for referring
-to the prediction matrix, and whether the concept similarity is
-applied or not is an implementation detail.
+Outside of this section, we use the notation $\bm{P}$ for referring to
+the prediction matrix, and whether the concept similarity is applied
+or not is an implementation detail.
 
 The simplest strategy for applying the concept similarity to
 previously computed predictions is by multiplying the two, treating
@@ -260,37 +260,15 @@ not true. Also, we assume that proposals are classified with no error
 by the object detector, neither this is true. Under those hypotesis,
 such application of concept similarity cannot be fruitful. 
 
-An example my clarify our statement. We are given $\bm{S}^c \in
-\Rset^{1 \times 2}$, $\bm{S}^c = [0.1, 0.2]$ for an example composed by a
-phrase and two proposal, and we know that the bounding box to ground
-with our prhrase is the first. The only way the model has to output
-the first proposal as the best bounding box, i.e., the bounding box to
-ground, is to predict a score $p_{0}$ which is at least the double of
-$p_{1}$, because
-\begin{equation}
-  \bm{P}^* = [0.1 * p_{0}, 0.2 * p_{1}]
-\end{equation}
-where $p_{j} = \bm{P}[0, j]$, and 
-\begin{equation}
-\begin{split}
-0.1 * p_{0} > 0.2 * p_{1} & \iff p_{0} >  \frac{0.2}{0.1} * p_{1} \\
-  & \iff p_{0} > 2 * p_{1}.
-\end{split}
-\end{equation}
-Thus, with such scores $\bm{S}^c$, when the model predicts $0.1$ for
-$p_1$, it must learn to predict $> 0.2$ for $p_0$, when it predicts
-$0.5$ for $p_1$, it must learn to predict $1.0$ for $p_0$ and when it
-predicts a value $> 0.5$ for $p_1$ there is no way to predict a
-greater score for $p_0$. In conclusion, it's very difficult to learn
-to ground in such settings and given problems highlighted above.
-
 A more convenient way of applying concept similarity to prediction is
 instead to compute the mean between two. Eventually, we can also put a
-weight on two terms in order to balance contributions. Formally,
-$\fapplysim$ becomes:
+weight $\lambda$ with values in $[0 .. 1]$ in order to balance
+contributions. Formally, $\fapplysim$ becomes:
 \begin{equation}
   \fapplysim^{\text{mean}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = (1 - \lambda) * \bm{S}^c_{jz} + \lambda * \bm{P}_{jz}.
 \end{equation}
+The major benefit of this approach is that model predictions are not
+constrained to values defined by concept similarity.
 
 \section{Training}
 
