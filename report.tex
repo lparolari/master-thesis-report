@@ -7,6 +7,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage[dvipsnames]{xcolor}
 \usepackage[backend=bibtex]{biblatex}
 
 \addbibresource{references.bib}
@@ -368,16 +369,25 @@ wihtout any possible improvement.
   \end{tabular}
   }
   \egroup
-  \caption{
-    Performace comparison on Flickr30k Entities dataset. \textit{Acc.}
-    is the standard accuracy, while \textit{P. Acc.} is the poiting
-    game accuracy. (Greater is better). Values in bolds represent best
-    performance. Works are listed by publication date.
-  }
+  \caption{%
+    \textcolor{red}{NOTE: OUR RESULTS ARE ON VALIDATION
+     SET.}\protect\footnotemark \hspace{0.5cm}
+     Performace comparison on Flickr30k Entities dataset.
+     \textit{Acc.} is the standard accuracy, while \textit{P. Acc.} is
+     the poiting game accuracy. (Greater is better). Values in bolds
+     represent best performance. Works are listed by publication
+     date.
+    }
   \label{tab:results}
 \end{table}
 
 \pagebreak
+
+\footnotetext{Due to time reasons, computational expansive tasks like
+the execution of the best model on test set is in the backlog of
+experiments. Usually, results on test set gain $1$\% accuracy wrt
+results on validation set.}
+
 \printbibliography
 
 \end{document}
