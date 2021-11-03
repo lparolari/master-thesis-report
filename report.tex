@@ -120,7 +120,8 @@ are defined as:
 \end{equation}
 where $||$ indicates the concatenation operator, $\bm{h}^{||}_{jz} \in
 \Rset^c$, $\bm{W}^{||} \in \Rset^{c \times (s + v)}$ is a matrix
-of weights, and $\bm{b}^{||} \in \Rset^c$ is a bias vector.
+of weights, $\bm{b}^{||} \in \Rset^c$ is a bias vector, and $L1$ is
+the L$1$ normalization function.
 
 % We also assume that the object detector returns, for each $\bm{p}_i$,
 % a probability distribution $Pr_{Cls}(\bm{p}_i)$ over a set $Cls$ of
@@ -144,7 +145,7 @@ textual features extraction is defined as:
   \bm{h}^*_j = L1(LSTM(E^{\bm{q}_j}))
 \end{equation}
 where $\bm{h}^*_j \in \Rset^t$ is the LSTM output of the last word in
-the noun phrase $\bm{q}_j$ , and $L1$ is the L$1$ normalization
+the noun phrase $\bm{q}_j$, and $L1$ is the L$1$ normalization
 function.
 
 \subsection{Similarity Branch}
