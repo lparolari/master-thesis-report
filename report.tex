@@ -316,34 +316,35 @@ introduce a kind of equality.
 
 \section{Experiment and Results}
 
-Experiments were carried out on Flickr30k and ReferIt dataset using
-common train, valid, test split sets made availabe by dataset authors.
-Results are evaluated thought standard accuracy, where a predicted
-bounding box $\bm{p}_z$ for a query phrase $\bm{q}_j$ is considered
-correct if its intersection over union (IoU) with the ground truth
-$\bm{p}^{gt}_z$ is at least 50\%, and poiting game accuracy, where an
-hit is considerect correct whether the center of the predicted
-bounding box $\bm{p}_z$ falls inside the ground truth bounding box
-$\bm{p}^{gt}_z$.
+Experiments were carried out on Flickr30k Entities and ReferIt dataset
+using common train, valid, test split sets made availabe by dataset
+authors. Results are evaluated thought standard accuracy, where a
+predicted bounding box $\bm{p}_z$ for a query phrase $\bm{q}_j$ is
+considered correct if its intersection over union (IoU) with the
+ground truth $\bm{p}^{gt}_z$ is at least 50\%, and poiting game
+accuracy, where an hit is considerect correct whether the center of
+the predicted bounding box $\bm{p}_z$ falls inside the ground truth
+bounding box $\bm{p}^{gt}_z$.
 
 The Tab.~\ref{tab:results} shows performance comparison on Flickr30k
-dataset.\footnote{For time reasons, we are concentrating our efforts
-on Flickr30k. Here, we do not report ReferIt results because we still
-have to run last experiments on it and we already outperformed all
-SotA works.} We outperformed by $5$\% best previous SotA work with
-pointing game accuracy. With standard accuracy instead we obtain
-nearly $6$\% worse results compared to \cite{wang2019phrase},
-outperforming all other works. In \cite{wang2019phrase}, they do not
-train a model: they use many pretrained object detectors in order to
-semantically match the content of the proposal with the concept of the
-phrase, then they disambiguate the between candidate proposals with a
-fixes strategy. We argue that, even if this is an intereseting
-approach, it higly depends on how a dataset is built. (For example, we
-outperform their model by $8$\% accuracy on ReferIt). Flick30k
-Entities is an high-quality dataset, but it is not exempt to some
-problems, such us the long-tail distribution on bounding box class
-labels. A model without a training stage is bound to leverage on the
-statistical distribution of data wihtout any possible improvement.
+Entities dataset.\footnote{For time reasons, we are concentrating our
+efforts on Flickr30k Entities. Here, we do not report ReferIt results
+because we still have to run last experiments on it and we already
+outperformed all SotA works.} We outperformed by $5$\% best previous
+SotA work with pointing game accuracy. With standard accuracy instead
+we obtain nearly $6$\% worse results compared to
+\cite{wang2019phrase}, outperforming all other works. In
+\cite{wang2019phrase}, they do not train a model: they use many
+pretrained object detectors in order to semantically match the content
+of the proposal with the concept of the phrase, then they disambiguate
+the between candidate proposals with a fixes strategy. We argue that,
+even if this is an intereseting approach, it higly depends on how a
+dataset is built. (For example, we outperform their model by $8$\%
+accuracy on ReferIt). Flick30k Entities is an high-quality dataset,
+but it is not exempt to some problems, such us the long-tail
+distribution on bounding box class labels. A model without a training
+stage is bound to leverage on the statistical distribution of data
+wihtout any possible improvement.
 
 \begin{table}
   \centering
@@ -367,10 +368,12 @@ statistical distribution of data wihtout any possible improvement.
   \end{tabular}
   }
   \egroup
-  \caption{Performace comparison on Flickr30k dataset. \textit{Acc.}
-  is the standard accuracy, while \textit{P. Acc.} is the poiting game
-  accuracy. (Greater is better). Values in bolds represent best
-  performance. Works are listed by publication date.}
+  \caption{
+    Performace comparison on Flickr30k Entities dataset. \textit{Acc.}
+    is the standard accuracy, while \textit{P. Acc.} is the poiting
+    game accuracy. (Greater is better). Values in bolds represent best
+    performance. Works are listed by publication date.
+  }
   \label{tab:results}
 \end{table}
 
