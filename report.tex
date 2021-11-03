@@ -205,30 +205,19 @@ as:
   \bm{P}_{jz} = \fsim ( \bm{h}^{||}_{jz} , \bm{h}^*_j ).
 \end{equation}
 
-As noted in (Kan et al, 2018), concept similarit is a direct
+As noted in \cite{chen2018knowledge}, concept similarity is a direct
 consequence of the intrinsic knwoledge convoyed by the object
 detector. Such score can be useful to down-weight unrelated proposals.
 Its effectiveness is due to the fact that the word embedding usually
 captures the semantic similarity between concept in phrase and the
 content of the bounding box, and thus, let the model focuses on
-relevant proposals.
-
-
-Hence, we can apply the concept similarity on previously computed
-$\bm{P}_{jz}$ as:
+relevant proposals. Thus, a straightforward improvement to our base
+model would be to include this knowledge and exploit it for making
+predictions. Hence, we can apply the concept similarity on previously
+computed predictions $\bm{P}_{jz}$ as:
 \begin{equation}
   \bm{\hat{P}}_{jz} = \fapplysim \left( \bm{S}^c_{jz}, \bm{P}_{jz} \right).
 \end{equation}
-For consistency with other sections, we show that $\bm{\hat{P}}_{jz}$
-is equal to $\bm{P}_{jz}$ by instancing $\fapplysim$ with
-$\fapplysim^{\text{one}}$, a funcion that simply ignore $\bm{S}^c$
-matrix:
-\begin{equation}
-  \fapplysim^{\text{one}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = \bm{P}_{jz}.
-\end{equation}
-Outside of this section, we use the matrix $\bm{P}$ to refer the
-prediction matrix, and whether the concept similarity is applied or
-not is an implementation detail.
 
 The simplest strategy for applying the concept similarity to
 previously computed predictions is by multiplying the two, treating
@@ -236,7 +225,6 @@ $\bm{S}^c_{jz}$ as a weight matrix:
 \begin{equation}
   \fapplysim^{\text{prod}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = \bm{S}^c_{jz} * \bm{P}_{jz}.
 \end{equation}
-
 At first glance, this approach seems very promising because we force
 the model to return predictions ``on steroid'' when there is a
 semantic relation between phrase and proposal or downweighted when no
