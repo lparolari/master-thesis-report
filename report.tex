@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{bbold}
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -12,7 +13,7 @@
 
 \input{macros.tex}
 
-\title{Weakly Supervised (!!) Visual-Textual Grounding based on Concept Similarity}
+\title{Unsupervised Visual-Textual Grounding based on Concept Similarity}
 \author{Luca Parolari}
 \date{November 2021}
 
@@ -27,17 +28,16 @@ from concept similarity. The goal is to solve phrase localization
 problem under unsupervised settings. Given a noun phrase, we define
 it's concept as the most important word in the phrase, while, given a
 bounding box we define it's class as the label, among a dictionary of
-labels, predicted with maximum confidence by an object detector for
-that bounding box. The concept similarity is the similarity between
-the phrase concept and bounding box class. Here, the key idea is that
-the head of the phrase should be very similar (semantically speaking)
-to the content of the bounding box and thus, to its class. Indeed, we
-optimize the model to learn a representation in this similarity
-subspace, where semantically similar features from image and text
+labels, predicted by an object detector for that bounding box. The
+concept similarity is the similarity between the phrase concept and
+bounding box class. Here, the key idea is that the head of the phrase
+should be very similar (semantically speaking) to the content of the
+bounding box and thus, to its class. Indeed, we optimize the model to
+learn a representation where similar concepts from image and text
 should be close each other, otherwise they are forced to be
-perpendicular. The unsupervision is obtained thought an oracle that,
-based concept similarty, determines whether to attract or repulse
-features.
+perpendicular. The model is unsupervised because no ground truth is
+used during training and supervision is enforced throught a similarity
+function computed among concepts.
 
 % Our model is straightforward. First of all, we gather image features
 % from the object detector and we compute five additional features
@@ -63,7 +63,7 @@ Given in input an image $\bm{I}$ and a
 sentence $\mathrm{S}$, phrase grounding consists in learning a mapping
 $\gamma$ from the set $\calQ$ of noun phrases to a set of bounding box
 $\calB$ defined on $\bm{I}$, i.e., $\gamma : \calI \times \calS
-\rightarrow 2^{\calQ \times \calB}$ (Rigoni et al., 2021). So, given
+\rightarrow 2^{\calQ \times \calB}$ \cite{rigoni2021better}. So, given
 an image $\bm{I}$ containing $e$ objects identified via the set of
 bounding boxes $B_\calI = \{ b_i \}^e_{i=1}$, where $b_i \in \Rset^4$
 is the vector of coordinates identifying a bounding box in $\bm{I}$,
@@ -121,7 +121,8 @@ are defined as:
 \end{equation}
 where $||$ indicates the concatenation operator, $\bm{h}^{||}_{jz} \in
 \Rset^c$, $\bm{W}^{||} \in \Rset^{c \times (s + v)}$ is a matrix
-of weights, and $\bm{b}^{||} \in \Rset^c$ is a bias vector.
+of weights, $\bm{b}^{||} \in \Rset^c$ is a bias vector, and $L1$ is
+the L$1$ normalization function.
 
 % We also assume that the object detector returns, for each $\bm{p}_i$,
 % a probability distribution $Pr_{Cls}(\bm{p}_i)$ over a set $Cls$ of
@@ -145,55 +146,41 @@ textual features extraction is defined as:
   \bm{h}^*_j = L1(LSTM(E^{\bm{q}_j}))
 \end{equation}
 where $\bm{h}^*_j \in \Rset^t$ is the LSTM output of the last word in
-the noun phrase $\bm{q}_j$ , and $L1$ is the L$1$ normalization
+the noun phrase $\bm{q}_j$, and $L1$ is the L$1$ normalization
 function.
 
 \subsection{Similarity Branch}
 
 Along with visual and textual features we also compute a similarity
-score between noun phrases and bounding box class labels. Such score
-is crucial for learning to ground, and for consistency with (Wang et
-al., 2019), we name it concept similarity. 
+score between noun phrases and bounding box class labels, the concept
+similarity \cite{wang2019phrase}. The similarity score is computed
+between pretrained embeddings, i.e., feature vectors, where each on
+represents a word from a dictionary and hopefully captures semantic as
+well as syntactic information.
 
-% The
-% idea behind this is straightforward: the more the noun phrase and the
-% councept expressed throught the bounding box label are semantically
-% similar, the more they are related. In a weakly-supervised scenario
-% where we are missing the grounding information, to known whether a
-% phrase and the concept that it expresses (i.e, the bounding box) are
-% related is very important for the learning process. 
-
-% Here, an
-% assumption is made: the bounding box class label semantically define
-% the content of the bounding box. 
-
-Formally, given set of proposal $\calP^{\bm{I}}$ and a noun phrase
-$\bm{q}_j$, we compute the concept similarity score for each proposal
-$i$ and phrase $j$ as:
+Formally, we define $\EPI = \{\ePI_i \}^{k}_{i=1}$ the set of class
+labels embeddings build on the set of proposal $\calP^{\bm{I}}$. Each
+$\ePI_i$ is a feature vector representing the class label predicted
+with maximum confidence by the object detector for the $i$-th
+proposal. Then, given a noun phrase $\bm{q}_j$ along with
+$E^{\bm{q}_j}$, we compute the concept similarity score for each
+proposal $i$ and phrase $j$ as:
 \begin{equation}
-  \bm{S}^c_{ji} = \fsim \left( \xi, \ePI_i \right),
+  \bm{S}^c_{ji} = \fsim \left( \xi_j, \ePI_i \right),
 \end{equation}
 where $\fsim$ is a similarity measure such us the cosine similarity,
-$\ePI_i$ is the embedding of the class for the $i$-th proposal, and
-$\xi$ is the embedding representing the concept of the noun phrase
+and $\xi$ is the embedding representing the concept of the noun phrase
 $\qj$:
 \begin{equation}
-  \xi = \fagg(\Eqj, \EPI).
+  \xi_j = \fagg(\Eqj, \EPI).
 \end{equation}
-Please note that we use the same notation for both phrases word
-embeddings and proposal class embeddings, indeed we define $\EPI =
-\{\ePI_i \}^{k}_{i=1}$ the set of embeddings representing the bounding
-box class labels, where $\ePI_i$ is the embedding of the class label
-for proposal $i$ predicted with maximum confidence by the object
-detector. 
-
-The new embedding $\xi$ can be computed with different strategies: for
+The new embedding $\xi_j$ can be computed with different strategies: for
 example, we can simply compute the mean of all word embeddings in the
 noun phrase:
 \begin{equation}
   \fagg^{\text{mean}}(\Eqj, \EPI) = \frac{\sum^l_{i=1} \eqj_i}{| \Eqj |},
 \end{equation}
-or use only the last word as done in (Wand et al, 2019):
+or use only the last word as done in \cite{wang2019phrase}:
 \begin{equation}
   \fagg^{\text{last}}(\Eqj, \EPI) = \eqj_l.
 \end{equation}
@@ -218,34 +205,20 @@ as:
 \begin{equation}
   \bm{P}_{jz} = \fsim ( \bm{h}^{||}_{jz} , \bm{h}^*_j ).
 \end{equation}
-Here, $c$ should be equal to $t$, where $c$ and $t$ are the dimensions
-of $\bm{h}^{||}_{jz} \in \Rset^c$ and $\bm{h}^*_j \in \Rset^t$,
-respectively.
 
-As noted in (Kan et al, 2018), concept similarit is a direct
+As noted in \cite{chen2018knowledge}, concept similarity is a direct
 consequence of the intrinsic knwoledge convoyed by the object
 detector. Such score can be useful to down-weight unrelated proposals.
 Its effectiveness is due to the fact that the word embedding usually
 captures the semantic similarity between concept in phrase and the
 content of the bounding box, and thus, let the model focuses on
-relevant proposals.
-
-
-Hence, we can apply the concept similarity on previously computed
-$\bm{P}_{jz}$ as:
+relevant proposals. Thus, a straightforward improvement to our base
+model would be to include this knowledge and exploit it for making
+predictions. Hence, we can apply the concept similarity on previously
+computed predictions $\bm{P}_{jz}$ as:
 \begin{equation}
   \bm{\hat{P}}_{jz} = \fapplysim \left( \bm{S}^c_{jz}, \bm{P}_{jz} \right).
 \end{equation}
-For consistency with other sections, we show that $\bm{\hat{P}}_{jz}$
-is equal to $\bm{P}_{jz}$ by instancing $\fapplysim$ with
-$\fapplysim^{\text{one}}$, a funcion that simply ignore $\bm{S}^c$
-matrix:
-\begin{equation}
-  \fapplysim^{\text{one}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = \bm{P}_{jz}.
-\end{equation}
-Outside of this section, we use the matrix $\bm{P}$ to refer the
-prediction matrix, and whether the concept similarity is applied or
-not is an implementation detail.
 
 The simplest strategy for applying the concept similarity to
 previously computed predictions is by multiplying the two, treating
@@ -253,7 +226,6 @@ $\bm{S}^c_{jz}$ as a weight matrix:
 \begin{equation}
   \fapplysim^{\text{prod}} (\bm{S}^c_{jz}, \bm{P}_{jz}) = \bm{S}^c_{jz} * \bm{P}_{jz}.
 \end{equation}
-
 At first glance, this approach seems very promising because we force
 the model to return predictions ``on steroid'' when there is a
 semantic relation between phrase and proposal or downweighted when no
@@ -284,26 +256,21 @@ contributions of all examples in the training set.
 Please note that in unsupervised settings, for a training example
 $\left( \bm{I}, S \right)$ we are not given the query-proposal pair
 set $\{ ( q^{gt}_j, p^{gt}_j ) \}^m_{j=1}$, where $m$ is the number of
-noun phrases.
-% Thus, how can instruct our model to learn without the ground truth?
-% This problem is well known in literature: in \todo{CITE: align2ground}
-% they enforces the score between a noun phrase and a proposal to be
-% higher than a non-paired proposal, and vice-versa. In ...
-To tackle this problem, in our work we adopt a very simple strategy:
-we exploit concept similarity. Basically, we attract representations
-whose concept similarity is above a certain treshold, otherwise we
-want to repulse them. We define our oracle as:
+noun phrases. To tackle this problem, in our work we adopt a very
+simple strategy: we exploit concept similarity. Basically, we attract
+representations whose concept similarity is above a certain treshold,
+otherwise we want to repulse them. We define our oracle as:
 \begin{equation}
   \bm{D}_{jz} =
   \begin{cases}
-    1, & \bm{S}^c_{jz} > \sigma \\
+    1, & \bm{S}^c_{jz} > \alpha \\
     -1, & \text{otherwise}
   \end{cases},
 \end{equation}
-where $\bm{S}^c$ is the concept similarity matrix, $j$ is the  $\sigma$ is the
-threshold. This policy relies on the assumption that concept
-similarity correctly captures the semantic relation between query and
-proposal. $\bm{D}$ is the concept direction matrix.
+where $\bm{S}^c$ is the concept similarity matrix, $j$ is the
+$\alpha$ is the threshold. This policy relies on the assumption that
+concept similarity correctly captures the semantic relation between
+query and proposal. $\bm{D}$ is the concept direction matrix.
 
 Now, given a training example $\left( \bm{I}, S \right)$, where
 $\cal{P}_{\bm{I}}$ the bounding box proposals set, we define the loss
@@ -316,44 +283,36 @@ bounding box, $\bm{P}_{jz}$ is the model predicted probability that
 the noun phrase $\bm{q}_j \in \calQ$ refers to the image content
 localized by $\bm{p}_z \in \calP_{\bm{I}}$. Our loss is scaled by $m$
 and $k$ because number of noun phrase can change, but also number of
-proposal: in our case, we ignore proposal with class label equal to
-``background''. 
+proposal. 
 
 We optimize the model to learn features representation in the
 similarity space, such that the depiction of $\bm{p}_z$ and $\bm{q}_j$
 are neighbors when $\bm{D}_{jz}$ is $1$, perpendicular otherwise.
 Formally:
 \begin{equation}
-  \floss^{\text{orthogonal}} \left( \bm{P}_{jz}, \bm{D}_{jz} \right) = - \bm{D}_{jz} \bm{P}^+_{jz} + \bm{D}_{jz} \bm{P}^-_{jz},
+  \floss^{\text{orthogonal}} \left( \bm{P}_{jz}, \bm{D}_{jz} \right) = - \bm{D}_{jz} \bm{P}^+_{jz} + \left( \bm{D}_{jz} \bm{P}^-_{jz} \right)^2,
 \end{equation}
-where $\bm{P}^+_{jz} = \sigma\left( \bm{D}_{jz} \right) \bm{P}_{jz}$
+where $\bm{P}^+_{jz} = \One\left( \bm{D}_{jz} \right) \bm{P}_{jz}$
 is the matrix that keeps predictions whose concept direction is over
-the threshold and cancel the other, $\bm{P}^-_{jz} = \sigma\left( -
+the threshold and cancel the other, $\bm{P}^-_{jz} = \One\left( -
 \bm{D}_{jz} \right) \bm{P}_{jz}$ instead cancels prediction with
-concept similarity above threshold; $\sigma$ is the unit step function
+concept similarity above threshold; $\One$ is the unit step function
 \begin{equation}
-  \sigma(x) =
+  \One(x) =
   \begin{cases}
     1, & x \geq 0 \\
     0, & \text{otherwise}
   \end{cases}.
 \end{equation}
 
-Also in this case, some different strategies are available. Instead of optimizing repulsed features to be perpendicular, one could also exploit the similarity space and force them to be inversely correlated:
-\begin{equation}
-  \floss^{\text{inv cor}} \left( \bm{P}_{jz}, \bm{D}_{jz} \right) = - \bm{D}_{jz} \bm{P}_{jz}.
-\end{equation}
-Another improvement would be to normalize the score by number of
-bounding box with same class label. Indeed, due to the long-tail
-distribution of bounding box class labels in dataset, some
+Also in this case, some different strategies are available. Instead of
+optimizing repulsed features to be perpendicular, one could also
+exploit the similarity space and force them to be inversely
+correlated. Another improvement would be to normalize the score by
+number of bounding box with same class label. Indeed, due to the
+long-tail distribution of bounding box class labels in dataset, some
 representations are moved more than other: the normalization allows to
-introduce a kind of equality. Formally, $\floss^{\text{inv cor}}$ can
-be rewritten as:
-\begin{equation}
-  \floss^{\text{normalized}} \left( \bm{P}_{jz}, \bm{D}_{jz} \right) = - \frac{\bm{D}_{jz} \bm{P}_{jz}}{\bm{C}_{jz}},
-\end{equation}
-where $\bm{C}_{jz}$ is the number of bounding box with same class as
-$\bm{p}_z$.
+introduce a kind of equality.
 
 \section{Experiment and Results}
 
@@ -415,6 +374,7 @@ statistical distribution of data wihtout any possible improvement.
   \label{tab:results}
 \end{table}
 
+\pagebreak
 \printbibliography
 
 \end{document}
