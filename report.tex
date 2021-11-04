@@ -7,6 +7,7 @@
 \usepackage{bm}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[backend=bibtex]{biblatex}
 
@@ -327,7 +328,7 @@ accuracy, where an hit is considerect correct whether the center of
 the predicted bounding box $\bm{p}_z$ falls inside the ground truth
 bounding box $\bm{p}^{gt}_z$.
 
-The Tab.~\ref{tab:results} shows performance comparison on Flickr30k
+The Tab.~\ref{tab:results-flickr30k} shows performance comparison on Flickr30k
 Entities dataset.\footnote{For time reasons, we are concentrating our
 efforts on Flickr30k Entities. Here, we do not report ReferIt results
 because we still have to run last experiments on it and we already
@@ -361,10 +362,14 @@ wihtout any possible improvement.
     Semantic Self-Supervision \cite{javed2018learning}       & weak & -    & 49.1 \\
     Multi-level Multimodal \cite{akbari2019multi}            & weak & -    & 57.9 \\
     Align2Ground \cite{datta2019align2ground}                & weak & 11.5 & 71.0 \\
-    Localziation w/o Training Examples \cite{wang2019phrase} & no   & \textbf{50.5} & -    \\
+    Localization w/o Training Examples \cite{wang2019phrase} & no   & \textbf{50.5} & -    \\
     Grounding By Separation \cite{arbelle2021detector}       & weak & -    & 70.5 \\
     \midrule
-    Ours                                                     & no   & 43.9 & \textbf{75.5} \\
+    \multicolumn{4}{l}{\textbf{Ours}} \\
+    Ours                                                     & no   & 34.1 & 70.7 \\
+    Ours (prior)                                             & no   & 39.5 & 75.1 \\
+    Ours (union)                                             & no   & 39.4 & 71.3 \\
+    Ours (prior + union)                                     & no   & 43.9 & \textbf{75.5} \\
     \bottomrule
   \end{tabular}
   }
@@ -378,15 +383,53 @@ wihtout any possible improvement.
      represent best performance. Works are listed by publication
      date.
     }
-  \label{tab:results}
+  \label{tab:results-flickr30k}
 \end{table}
 
-\pagebreak
+\begin{table}
+  \centering
+  \bgroup
+  %\def\arraystretch{1.5}
+  \resizebox{\textwidth}{!} {%
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Approach} & \textbf{Supervision} & \textbf{Acc. (\%)} & \textbf{P. Acc. (\%)} \\
+    \midrule
+    Top-Down Visual Saliency \cite{ramanishka2017top}        & weak & -    & -    \\
+    KAC Net \cite{chen2018knowledge}                         & weak & 15.8 & -    \\
+    Semantic Self-Supervision \cite{javed2018learning}       & weak & -    & 40.0 \\
+    Multi-level Multimodal \cite{akbari2019multi}            & weak & -    & 48.4 \\
+    Align2Ground \cite{datta2019align2ground}                & weak & -    & -    \\
+    Localization w/o Training Examples \cite{wang2019phrase} & no   & 26.5 & -    \\
+    Grounding By Separation \cite{arbelle2021detector}       & weak & -    & 59.4 \\
+    \midrule
+    \multicolumn{4}{l}{\textbf{Ours}} \\
+    Ours                                                     & no   & 29.9 & 55.6 \\
+    Ours (prior)                                             & no   & 34.7 & 59.2 \\
+    Ours (union)                                             & n/a  & n/a  & n/a  \\
+    Ours (prior + union)                                     & n/a  & n/a  & n/a  \\
+    \bottomrule
+  \end{tabular}
+  }
+  \egroup
+  \caption{%
+    \textcolor{red}{NOTE: OUR RESULTS ARE ON VALIDATION
+     SET.} \hspace{0.5cm}
+     Performace comparison on ReferIt dataset. \textit{Acc.} is the
+     standard accuracy, while \textit{P. Acc.} is the poiting game
+     accuracy. (Greater is better). Values in bolds represent best
+     performance. Works are listed by publication
+     date.
+    }
+  \label{tab:results-referit}
+\end{table}
 
 \footnotetext{Due to time reasons, computational expansive tasks like
 the execution of the best model on test set is in the backlog of
 experiments. Usually, results on test set gain $1$\% accuracy wrt
 results on validation set.}
+
+\pagebreak
 
 \printbibliography
 
