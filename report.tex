@@ -278,7 +278,7 @@ Now, given a training example $\left( \bm{I}, S \right)$, where
 $\cal{P}_{\bm{I}}$ the bounding box proposals set, we define the loss
 function $\calL$ (for a single example) as:
 \begin{equation}
-  \calL = \frac{1}{m} \sum^m_{j=1} \Bigg( \frac{1}{z} \sum^k_{z=1} \floss ( \bm{P}_{jz}, \bm{D}_{jz} ) \Bigg)
+  \calL = \frac{1}{m} \sum^m_{j=1} \Bigg( \frac{1}{k} \sum^k_{z=1} \floss ( \bm{P}_{jz}, \bm{D}_{jz} ) \Bigg)
 \end{equation}
 where $m$ in the number of noun phrases, $k$ is the number of proposal
 bounding box, $\bm{P}_{jz}$ is the model predicted probability that
