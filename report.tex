@@ -429,6 +429,36 @@ the execution of the best model on test set is in the backlog of
 experiments. Usually, results on test set gain $1$\% accuracy wrt
 results on validation set.}
 
+\section{Ablation Study}
+
+\begin{table}
+  \centering
+  %\def\arraystretch{1.5}
+  \resizebox{\textwidth}{!} {%
+  \begin{tabular}{ccc|cc}
+    \toprule
+    \textbf{Loss} & \textbf{Loc. Strategy} & \textbf{Prior} & \textbf{Acc. (\%)} & \textbf{P. Acc. (\%)} \\
+    \midrule
+    orthogonal & max & no & 35.5 & 71.3 \\
+    orthogonal + freq scaled & union & no & 40.2 & 72.0 \\
+    orthogonal & union & no & 40.4 & 72.0 \\
+    orthogonal & max & mean & 41.6 & 76.0 \\
+    using only concept similarity & union & - & 44.7 & 75.3 \\
+    orthogonal + repulsive feat & union & mean & 45.8 & 76.9 \\
+    orthogonal & union & mean & 45.9 & 77.0 \\
+    orthogonal + freq scaled & union & mean & 45.9 & 77.2 \\
+    \bottomrule
+  \end{tabular}}
+  \caption{%
+    Ablation study on Flickr30k Entities. \textit{Loc. Strategy}
+    refers to the strategy employed for the localization of the
+    predicted bounding box to compare with ground truth. Results
+    are sorted by accuracy, from worse to best.
+  }
+  \label{tab:ablation-flickr30k}
+\end{table}
+
+
 \pagebreak
 
 \printbibliography
